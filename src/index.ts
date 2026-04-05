@@ -21,7 +21,12 @@ async function buildServer() {
 
   // ── CORS ──────────────────────────────────────────────────────────────────
   await fastify.register(cors, {
-    origin: ["http://localhost:3000", "http://localhost:3001"],
+    origin: [
+      "http://localhost:3000",
+      "http://localhost:3001",
+      "https://britinstitute.uk",
+      "https://www.britinstitute.uk"
+    ],
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   });
 
