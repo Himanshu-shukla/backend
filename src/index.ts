@@ -3,8 +3,10 @@ import Fastify from "fastify";
 import cors from "@fastify/cors";
 import { connectDB } from "./config/db";
 import { courseRoutes } from "./routes/courses";
-
-const PORT = Number(process.env.PORT) || 4000;
+import { contactRoutes } from "./routes/contact";
+import { leadRoutes } from "./routes/leads";
+// Force PORT to 4000 (ignoring process.env.PORT) to prevent collisions with Next.js if standard PORT is globally set to 3000 in the shell.
+const PORT = 4000;
 
 async function buildServer() {
   const fastify = Fastify({
@@ -37,6 +39,8 @@ async function buildServer() {
 
   // ── Routes ────────────────────────────────────────────────────────────────
   await fastify.register(courseRoutes);
+  await fastify.register(contactRoutes);
+  await fastify.register(leadRoutes);
 
   return fastify;
 }
