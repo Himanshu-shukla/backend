@@ -27,7 +27,9 @@ async function buildServer() {
       "http://localhost:3000",
       "http://localhost:3001",
       "https://britinstitute.uk",
-      "https://www.britinstitute.uk"
+      "https://www.britinstitute.uk",
+      "https://learnifyops.com",
+      "https://www.learnifyops.com"
     ],
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   });
