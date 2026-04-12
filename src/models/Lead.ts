@@ -9,6 +9,10 @@ export interface ILead extends Document {
   subject?: string;
   message?: string;
   source: string;
+  status: string;
+  priority: string;
+  folder?: string;
+  metaLeadId?: string;
   createdAt: Date;
 }
 
@@ -22,7 +26,10 @@ const LeadSchema = new Schema<ILead>(
     subject: { type: String },
     message: { type: String },
     source: { type: String, required: true, default: "Website" },
-    createdAt: { type: Date, default: Date.now },
+    status: { type: String, default: "New" },
+    priority: { type: String, default: "Medium" },
+    folder: { type: String },
+    metaLeadId: { type: String },
   },
   {
     timestamps: true,

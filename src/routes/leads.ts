@@ -22,6 +22,8 @@ export async function leadRoutes(fastify: FastifyInstance) {
         return reply.status(400).send({ success: false, error: "Missing required fields: name/fullName, email" });
       }
 
+      const resolvedSource = source || "Brit Institute Website";
+
       const newLead = await Lead.create({
         name: unifiedName,
         email,
@@ -30,7 +32,10 @@ export async function leadRoutes(fastify: FastifyInstance) {
         purpose,
         subject,
         message,
-        source: source || "Website",
+        source: resolvedSource,
+        status: "New",
+        priority: "Medium",
+        folder: resolvedSource,
       });
 
       return reply.status(201).send({ success: true, data: newLead });
