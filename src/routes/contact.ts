@@ -4,17 +4,21 @@ import { Contact } from "../models/Contact";
 export async function contactRoutes(fastify: FastifyInstance) {
   fastify.post("/api/contact", async (request, reply) => {
     try {
-      const { fullName, email, subject, message } = request.body as any;
+      const { fullName, name, email, phone, course, subject, message } = request.body as any;
+      
+      const resolvedName = fullName || name;
 
-      if (!fullName || !email || !message) {
-        return reply.status(400).send({ success: false, error: "Missing required fields: fullName, email, message" });
+      if (!resolvedName || !email) {
+        return reply.status(400).send({ success: false, error: "Missing required fields: fullName/name, email" });
       }
 
       const newContact = await Contact.create({
-        fullName,
+        fullName: resolvedName,
         email,
-        subject: subject || "",
-        message,
+        phone,
+        course,
+        subject: subject || "Contact Form Submission",
+        message: message || `User submitted details.`,
       });
 
       return reply.status(201).send({ success: true, data: newContact });

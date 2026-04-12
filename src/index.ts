@@ -28,6 +28,8 @@ async function buildServer() {
       "http://localhost:3001",
       "https://britinstitute.uk",
       "https://www.britinstitute.uk",
+      "https://sixfigurecareer.britinstitute.uk",
+      "https://www.sixfigurecareer.britinstitute.uk",
       "https://learnifyops.com",
       "https://www.learnifyops.com"
     ],
