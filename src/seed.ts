@@ -9,9 +9,11 @@ const SEED_COURSES = [
     topBadge: "IN DEMAND",
     bottomLeftBadge: "DATA ANALYTICS",
     isPopular: true,
-    title: "Data Analytics Course with Generative AI",
+    title: "Data Analyst and Gen AI certification program",
     desc: "Learn data analysis, dashboards and AI tools for job-ready skills.",
-    duration: "4-6 Months",
+    price: 3499,
+    currency: "GBP",
+    duration: "6 Months",
     projects: "Real-world use cases",
     gradient: "from-blue-500 to-blue-700",
     iconName: "BarChart",
@@ -22,9 +24,11 @@ const SEED_COURSES = [
     topBadge: "ADVANCED",
     bottomLeftBadge: "DATA SCIENCE",
     isPopular: true,
-    title: "Data Science & Machine Learning Course",
+    title: "Data Science & Machine Learning Certification Program",
     desc: "Build predictive models and advanced data systems.",
-    duration: "6 Months",
+    price: 4499,
+    currency: "GBP",
+    duration: "12 Months",
     projects: "Predictive modeling",
     gradient: "from-teal-400 to-teal-600",
     iconName: "Code",
@@ -33,15 +37,32 @@ const SEED_COURSES = [
   {
     slug: "ai-automation",
     topBadge: "FEATURED",
-    bottomLeftBadge: "AI & AUTOMATION",
+    bottomLeftBadge: "AGENTIC AI",
     isPopular: true,
-    title: "AI & Automation Course",
-    desc: "Create intelligent workflows and automation solutions.",
+    title: "Agentic AI Certification Program",
+    desc: "Build intelligent agent workflows and practical automation systems.",
+    price: 1999,
+    currency: "GBP",
     duration: "4 Months",
-    projects: "Workflow automation",
+    projects: "Agent workflows",
     gradient: "from-purple-500 to-purple-700",
     iconName: "Layers",
     order: 3,
+  },
+  {
+    slug: "gen-ai",
+    topBadge: "FOUNDATION",
+    bottomLeftBadge: "GEN AI",
+    isPopular: false,
+    title: "Generative AI Certificaation Program",
+    desc: "Learn practical prompting, copilots, and real-world generative AI workflows.",
+    price: 1200,
+    currency: "GBP",
+    duration: "3 Months",
+    projects: "Prompting use cases",
+    gradient: "from-amber-400 to-orange-500",
+    iconName: "Sparkles",
+    order: 4,
   },
 ];
 
@@ -51,13 +72,12 @@ async function seed() {
   console.log("🌱 Seeding courses...");
 
   for (const courseData of SEED_COURSES) {
-    const existing = await Course.findOne({ slug: courseData.slug });
-    if (existing) {
-      console.log(`  ⚠️  Skipping "${courseData.title}" — already exists`);
-      continue;
-    }
-    await Course.create(courseData);
-    console.log(`  ✅ Created: ${courseData.title}`);
+    const updated = await Course.findOneAndUpdate(
+      { slug: courseData.slug },
+      { $set: courseData },
+      { upsert: true, new: true, runValidators: true }
+    );
+    console.log(`  ✅ Upserted: ${updated.title}`);
   }
 
   console.log("\n✨ Seeding complete!");

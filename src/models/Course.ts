@@ -7,6 +7,8 @@ export interface ICourse extends Document {
   isPopular: boolean;
   title: string;
   desc: string;
+  price: number;
+  currency: string;
   duration: string;
   projects: string;
   gradient: string;
@@ -47,6 +49,18 @@ const CourseSchema = new Schema<ICourse>(
     desc: {
       type: String,
       required: [true, "Description is required"],
+      trim: true,
+    },
+    price: {
+      type: Number,
+      required: [true, "Price is required"],
+      min: [0, "Price cannot be negative"],
+    },
+    currency: {
+      type: String,
+      required: [true, "Currency is required"],
+      default: "GBP",
+      uppercase: true,
       trim: true,
     },
     duration: {
