@@ -4,7 +4,9 @@ import cors from "@fastify/cors";
 import { connectDB } from "./config/db";
 import { courseRoutes } from "./routes/courses";
 import { contactRoutes } from "./routes/contact";
+import { emailComplianceRoutes } from "./routes/emailCompliance";
 import { leadRoutes } from "./routes/leads";
+import { testSesRoutes } from "./routes/testSes";
 // Force PORT to 4000 (ignoring process.env.PORT) to prevent collisions with Next.js if standard PORT is globally set to 3000 in the shell.
 const PORT = 4000;
 
@@ -45,6 +47,8 @@ async function buildServer() {
   await fastify.register(courseRoutes);
   await fastify.register(contactRoutes);
   await fastify.register(leadRoutes);
+  await fastify.register(emailComplianceRoutes);
+  await fastify.register(testSesRoutes);
 
   return fastify;
 }
