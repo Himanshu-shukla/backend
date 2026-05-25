@@ -9,7 +9,7 @@ const SEED_COURSES = [
     topBadge: "IN DEMAND",
     bottomLeftBadge: "DATA ANALYTICS",
     isPopular: true,
-    title: "Data Analyst and Gen AI certification program",
+    title: "Data Analyst and Gen AI Certification Program",
     desc: "Learn data analysis, dashboards and AI tools for job-ready skills.",
     price: 3499,
     currency: "GBP",
