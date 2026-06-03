@@ -77,14 +77,6 @@ const FALLBACK_COURSES: Record<string, CoursePaymentDetails> = {
   },
 };
 
-function getRequiredEnv(name: string) {
-  const value = process.env[name];
-  if (!value) {
-    throw new Error(`${name} is not configured`);
-  }
-  return value;
-}
-
 function toMinorUnits(amount: number) {
   return Math.round(amount * 100);
 }
@@ -101,22 +93,66 @@ function roundCurrency(value: number) {
   return Math.round(value * 100) / 100;
 }
 
+function getPaymentMode(): "live" | "sandbox" {
+  const mode =
+    process.env.PAYMENT_MODE ??
+    process.env.PAYMENTS_MODE ??
+    process.env.PAYPAL_ENVIRONMENT ??
+    process.env.NODE_ENV;
+
+  return mode?.trim().toLowerCase() === "live" ? "live" : "sandbox";
+}
+
+function isLivePaymentMode() {
+  return getPaymentMode() === "live";
+}
+
+function getFirstEnvValue(names: string[]) {
+  for (const name of names) {
+    const value = process.env[name]?.trim();
+    if (value) return value;
+  }
+
+  return "";
+}
+
+function getRequiredFirstEnv(names: string[]) {
+  const value = getFirstEnvValue(names);
+  if (!value) {
+    throw new Error(`${names.join(" or ")} is not configured`);
+  }
+
+  return value;
+}
+
 function getPayPalBaseUrl() {
-  return process.env.PAYPAL_ENVIRONMENT === "live"
+  return isLivePaymentMode()
     ? "https://api-m.paypal.com"
     : "https://api-m.sandbox.paypal.com";
 }
 
 function getPayPalClientId() {
-  return process.env.PAYPAL_ENVIRONMENT === "live"
-    ? process.env.PAYPAL_CLIENT_ID_LIVE || process.env.PAYPAL_CLIENT_ID || ""
-    : process.env.PAYPAL_CLIENT_ID || "";
+  return isLivePaymentMode()
+    ? getFirstEnvValue(["PAYPAL_CLIENT_ID_LIVE"])
+    : getFirstEnvValue(["PAYPAL_CLIENT_ID"]);
 }
 
 function getPayPalClientSecret() {
-  return process.env.PAYPAL_ENVIRONMENT === "live"
-    ? process.env.PAYPAL_CLIENT_SECRET_LIVE || process.env.PAYPAL_CLIENT_SECRET || ""
-    : process.env.PAYPAL_CLIENT_SECRET || "";
+  return isLivePaymentMode()
+    ? getFirstEnvValue(["PAYPAL_CLIENT_SECRET_LIVE"])
+    : getFirstEnvValue(["PAYPAL_CLIENT_SECRET"]);
+}
+
+function getRazorpayKeyId() {
+  return isLivePaymentMode()
+    ? getRequiredFirstEnv(["RAZORPAY_KEY_ID_LIVE", "RAZORPAY_KEY_ID_PROD"])
+    : getRequiredFirstEnv(["RAZORPAY_KEY_ID"]);
+}
+
+function getRazorpayKeySecret() {
+  return isLivePaymentMode()
+    ? getRequiredFirstEnv(["RAZORPAY_KEY_SECRET_LIVE", "RAZORPAY_KEY_SECRET_PROD"])
+    : getRequiredFirstEnv(["RAZORPAY_KEY_SECRET"]);
 }
 
 function getBasicAuth(username: string, password: string) {
@@ -281,10 +317,12 @@ export async function paymentRoutes(fastify: FastifyInstance) {
     return reply.status(200).send({
       success: true,
       data: {
-        razorpayKeyId: process.env.RAZORPAY_KEY_ID ?? "",
+        razorpayKeyId: getFirstEnvValue(
+          isLivePaymentMode() ? ["RAZORPAY_KEY_ID_LIVE", "RAZORPAY_KEY_ID_PROD"] : ["RAZORPAY_KEY_ID"]
+        ),
         paypalClientId: getPayPalClientId(),
         paypalCurrency: "GBP",
-        paypalEnvironment: process.env.PAYPAL_ENVIRONMENT === "live" ? "live" : "sandbox",
+        paypalEnvironment: getPaymentMode(),
         paypalPayLaterMinAmount: 30,
         paypalPayLaterMaxAmount: 2000,
         paymentLinks: {
@@ -325,8 +363,8 @@ export async function paymentRoutes(fastify: FastifyInstance) {
       try {
         const baseCourse = await resolveCoursePaymentDetails(req.body.courseSlug);
         const { course, discount } = await applyCouponToCourse(baseCourse, req.body.couponCode);
-        const keyId = getRequiredEnv("RAZORPAY_KEY_ID");
-        const keySecret = getRequiredEnv("RAZORPAY_KEY_SECRET");
+        const keyId = getRazorpayKeyId();
+        const keySecret = getRazorpayKeySecret();
         const receipt = `rcpt_${Date.now().toString(36)}_${course.slug}`.slice(0, 40);
 
         const response = await fetch("https://api.razorpay.com/v1/orders", {
@@ -382,7 +420,7 @@ export async function paymentRoutes(fastify: FastifyInstance) {
     async (req: FastifyRequest<{ Body: RazorpayVerifyBody }>, reply: FastifyReply) => {
       try {
         await resolveCoursePaymentDetails(req.body.courseSlug);
-        const keySecret = getRequiredEnv("RAZORPAY_KEY_SECRET");
+        const keySecret = getRazorpayKeySecret();
         const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
 
         if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
