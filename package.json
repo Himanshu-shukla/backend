@@ -11,7 +11,7 @@
     "seed:coupons": "ts-node src/seedCoupons.ts"
   },
   "dependencies": {
-    "@aws-sdk/client-sesv2": "^3.1051.0",
+    "@aws-sdk/client-sesv2": "^3.1060.0",
     "@fastify/cors": "^9.0.1",
     "dotenv": "^16.4.5",
     "fastify": "^4.28.1",
