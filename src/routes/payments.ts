@@ -460,7 +460,7 @@ export async function paymentRoutes(fastify: FastifyInstance) {
         paypalCurrency: "GBP",
         paypalEnvironment: getPaymentMode(),
         paypalPayLaterMinAmount: 20,
-        paypalPayLaterMaxAmount: 3500,
+        paypalPayLaterMaxAmount: 3000,
         paymentLinks: {
           razorpayPaymentPageUrl: getPaymentLinkEnv("RAZORPAY_PAYMENT_PAGE_URL"),
           paypalMeUrl: getPaymentLinkEnv("PAYPAL_ME_URL"),
